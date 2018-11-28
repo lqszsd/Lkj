@@ -2,10 +2,14 @@
 /**
  * MyPDO
  */
-class MyPDO
+class Db
 {
     protected static $_instance = null;
-    protected $dbName = '';
+    protected $dbHost='127.0.0.1';
+    protected $dbUser='root';
+    protected $dbPasswd='root';
+    protected  $dbName='test';
+    protected $dbCharset = 'utf-8';
     protected $dsn;
     protected $dbh;
 
@@ -14,7 +18,7 @@ class MyPDO
      *
      * @return MyPDO
      */
-    private function __construct($dbHost, $dbUser, $dbPasswd, $dbName, $dbCharset)
+    protected function __construct($dbHost, $dbUser, $dbPasswd, $dbName, $dbCharset)
     {
         try {
             $this->dsn = 'mysql:host='.$dbHost.';dbname='.$dbName;
