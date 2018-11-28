@@ -7,7 +7,7 @@
  */
 require_once 'lq_liblary/common_function.php';
 require_once 'lq_liblary/db.php';
-require_once '../config.php';
+//require_once '../config.php';
 $request_url = $_SERVER['REQUEST_URI'];
 $script_name = $_SERVER['SCRIPT_NAME'];
 $request = str_replace($script_name, '', $request_url);

@@ -2,17 +2,14 @@
 /**
  * MyPDO
  */
+$db = Db::getInstance('localhost', 'root', 'root', 'class', 'utf8');
 class Db
 {
     protected static $_instance = null;
-    protected $dbHost='127.0.0.1';
-    protected $dbUser='root';
-    protected $dbPasswd='root';
-    protected  $dbName='test';
-    protected $dbCharset = 'utf-8';
     protected $dsn;
     protected $dbh;
-
+    protected $table_prefix;
+    protected $table_name;
     /**
      * 构造
      *
@@ -27,8 +24,24 @@ class Db
         } catch (PDOException $e) {
             $this->outputError($e->getMessage());
         }
+        $this->initTable();
     }
-
+    public function initTable(){
+        //先查询table表
+        $data=$this->query("show tables;",'All');
+        $table_name = "{$this->table_prefix}{$this->table_name}";
+        $table_array=[];
+        //foreach 取出表名
+        foreach ($data as $key=>$value){
+            $table_array[]=$value;
+        }
+        //判断当前表是否在数据库存在
+        if(!isset($table_array[$table_name])){
+            //如果不存在就创建数据库
+            $this->query("CREATE TABLE `{$table_name}` ( `id` INT NOT NULL AUTO_INCREMENT, `created_at` DATETIME NOT NULL , `updated_at` TIMESTAMP on update CURRENT_TIMESTAMP() NOT NULL DEFAULT CURRENT_TIMESTAMP() , PRIMARY KEY (`id`)) ENGINE = InnoDB;",'All');
+        }
+        var_dump($data);
+    }
     /**
      * 防止克隆
      *
