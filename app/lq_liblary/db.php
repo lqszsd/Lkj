@@ -8,8 +8,8 @@ class Db
     protected static $_instance = null;
     protected $dsn;
     protected $dbh;
-    protected $table_prefix;
-    protected $table_name;
+    protected $table_prefix="lq_";
+    protected $table_name="test";
     /**
      * 构造
      *
@@ -40,7 +40,8 @@ class Db
             //如果不存在就创建数据库
             $this->query("CREATE TABLE `{$table_name}` ( `id` INT NOT NULL AUTO_INCREMENT, `created_at` DATETIME NOT NULL , `updated_at` TIMESTAMP on update CURRENT_TIMESTAMP() NOT NULL DEFAULT CURRENT_TIMESTAMP() , PRIMARY KEY (`id`)) ENGINE = InnoDB;",'All');
         }
-        var_dump($data);
+       //获取当前数据库字段
+        $filed=$this->getFields($table_name);
     }
     /**
      * 防止克隆
