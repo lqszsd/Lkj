@@ -29,17 +29,14 @@ class phpEmail
 
     public function sendEmail()
     {
-        //Recipients
         $this->email->setFrom('from@example.com', 'Mailer');
         // Add a recipient
         $this->email->addAddress('ellen@example.com');               // Name is optional
         $this->email->addReplyTo('info@example.com', 'Information');
         $this->email->addCC('cc@example.com');
         $this->email->addBCC('bcc@example.com');
-        //Attachments
         $this->email->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
         $this->email->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
-        //Content
         $this->email->isHTML(true);                                  // Set email format to HTML
         $this->email->Subject = 'Here is the subject';
         $this->email->Body = 'This is the HTML message body <b>in bold!</b>';
