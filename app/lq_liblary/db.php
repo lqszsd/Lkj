@@ -10,6 +10,7 @@ class Db
     protected $dbh;
     protected $table_prefix="lq_";
     protected $table_name="test";
+    protected $sql_info=[];
     /**
      * 构造
      *
@@ -33,15 +34,70 @@ class Db
         $table_array=[];
         //foreach 取出表名
         foreach ($data as $key=>$value){
-            $table_array[]=$value;
+            $table_array[]=$value['Tables_in_class'];
         }
+        //var_dump($table_array);
         //判断当前表是否在数据库存在
-        if(!isset($table_array[$table_name])){
+        if(isset($table_array[$table_name])){
             //如果不存在就创建数据库
             $this->query("CREATE TABLE `{$table_name}` ( `id` INT NOT NULL AUTO_INCREMENT, `created_at` DATETIME NOT NULL , `updated_at` TIMESTAMP on update CURRENT_TIMESTAMP() NOT NULL DEFAULT CURRENT_TIMESTAMP() , PRIMARY KEY (`id`)) ENGINE = InnoDB;",'All');
         }
        //获取当前数据库字段
         $filed=$this->getFields($table_name);
+        $table_info=$this->getTable();
+        foreach ($table_info as $key=>$value) {
+            //如果数据库不存在这个字段就增加这个字段
+            if (!isset($filed[$key])) {
+                $this->query("ALTER TABLE `{$table_name}` ADD `{$key}` {$value['type']}({$value['length']}) NOT NULL DEFAULT '{$value['default']}' COMMENT '{$value['comment']}' AFTER `{$filed['id']}`;");
+            }
+            //如果存在需要更新的标志就更新
+            if ($value['updated'] == 1) {
+                $this->query("ALTER TABLE `{$table_name}` MODIFY COLUMN `{$key}`  {$value['type']}({$value['length']}) NOT NULL DEFAULT '{$value['default']}' COMMENT '{$value['comment']}' AFTER `{$filed['id']}`;");
+            }
+        }
+    }
+   protected function getTable(){
+        return $this->sql_info;
+   }
+    public static function generateType($type, $comment, $length, $default,$updated_type)
+    {
+        return [
+            "type" => $type,
+            "comment" => $comment,
+            "length" => $length,
+            "default" => $default,
+            "updated"=>$updated_type
+        ];
+    }
+
+    public static function generateINT($comment = "", $length = 11, $default = 0,$updated_type)
+    {
+        return self::generateType("INT", $comment, $length, $default,$updated_type);
+    }
+
+    public static function generateVARCHAR($comment = "", $length = 128, $default = '',$updated_type)
+    {
+        return self::generateType("VARCHAR", $comment, $length, $default,$updated_type);
+    }
+
+    public static function generateTEXT($comment = "", $default = '',$updated_type)
+    {
+        return self::generateType("TEXT", $comment, 0, $default,$updated_type);
+    }
+
+    public static function generateLONGTEXT($comment = "", $default = '',$updated_type)
+    {
+        return self::generateType("LONGTEXT", $comment, 0, $default,$updated_type);
+    }
+
+    public static function generateDATETIME($comment = "", $default = '0000-00-00 00:00:00',$updated_type)
+    {
+        return self::generateType("DATETIME", $comment, 0, $default,$updated_type);
+    }
+
+    public static function generateDECIMAL($comment = "", $default = '0',$updated_type)
+    {
+        return self::generateType("DECIMAL", $comment, '10,2', $default,$updated_type);
     }
     /**
      * 防止克隆
